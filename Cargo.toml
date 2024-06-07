@@ -1,0 +1,23 @@
+[package]
+name = "crud-pessoa"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rocket = "0.5.1"
+chrono = "0.4.38"
+serde = "1.0.203"
+serde_json = "1.0.117"
+diesel = { version = "2.2.0", features = ["postgres", "chrono", "uuid"] }
+dotenvy = "0.15.7"
+
+[dependencies.uuid]
+version = "1.8.0"
+features = [
+    "v4",                # Lets you generate random UUIDs
+    "fast-rng",          # Use a faster (but still sufficiently random) RNG
+    "macro-diagnostics", # Enable better diagnostics for compile-time UUIDs,
+]
+
+[build]
+rustc-args = ["-Vv"]
