@@ -4,7 +4,7 @@ use rocket::{get, post, put, delete, http::Status, Response};
 use rocket::http::ContentType;
 use rocket::response::content;
 use serde_json::{json, Value};
-use crate::domain::entities::UserDomainEntity;
+use crate::domain::entities::{QueryRequestDomainEntity, UserDomainEntity};
 use crate::domain::shared::UsecaseSpecification;
 use crate::domain::usecases::list_users_usecase::ListUsersUsecase;
 
@@ -14,15 +14,17 @@ pub fn new_user() -> content::RawJson<&'static str> {
     content::RawJson("{\"message\": \"test post users\"}")
 }
 
-#[get("/users")]
-pub fn get_all() -> content::RawJson<String> {
-    let data = ListUsersUsecase.execute(UserDomainEntity{
-        id: Default::default(),
-        username: "".to_string(),
-        password: "".to_string(),
-        created_at: Default::default(),
-        updated_at: Default::default(),
-    });
+#[get("/users?<page>&<size>")]
+pub fn get_all(
+    page: Option<i64>,
+    size: Option<i64>
+) -> content::RawJson<String> {
+    let data = ListUsersUsecase.execute(
+        QueryRequestDomainEntity{
+            page,
+            size
+        }
+    );
 
     let data_json = serde_json::to_string(&data)
         .expect("Failed to serialize users to JSON");

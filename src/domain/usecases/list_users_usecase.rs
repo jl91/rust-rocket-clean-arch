@@ -1,23 +1,28 @@
 pub struct ListUsersUsecase;
 
-use diesel::RunQueryDsl;
+use rocket::yansi::Paint;
+use uuid::Uuid;
 use crate::domain::shared::UsecaseSpecification;
-use crate::domain::entities::UserDomainEntity;
-use crate::infrastructure::database::connection::get_connection;
-use crate::infrastructure::database::schemas::users;
+use crate::domain::entities::{QueryRequestDomainEntity, UserDomainEntity};
 use crate::infrastructure::database::entities::User;
+use crate::infrastructure::database::repositories::{Repository, UserRepository};
 
-impl UsecaseSpecification<UserDomainEntity, Vec<UserDomainEntity>> for ListUsersUsecase {
-    fn execute(&self, _: UserDomainEntity) -> Vec<UserDomainEntity> {
+impl UsecaseSpecification<QueryRequestDomainEntity, Vec<UserDomainEntity>> for ListUsersUsecase {
+    fn execute(
+        &self,
+        query_request_domain_entity: QueryRequestDomainEntity
+    ) -> Vec<UserDomainEntity> {
 
-        let connection =&mut get_connection();
+        let mut user_repository = <UserRepository as Repository<User, Uuid>>::new();
+        // let size = Option.new();
 
-        let mut result = users::table
-            .load::<User>(connection)
-            .expect("Error loading users");
 
-       result
-            .into_iter()
+
+       user_repository
+           .find_all(
+               query_request_domain_entity.size,
+               query_request_domain_entity.page
+           )
             .map(|entity| UserDomainEntity {
                 id: entity.external_id.to_string(),
                 username: entity.username,

@@ -19,3 +19,10 @@ pub struct UserDomainEntity {
     pub created_at: String,
     pub updated_at: String,
 }
+
+
+#[derive(Deserialize, Debug)]
+pub struct QueryRequestDomainEntity{
+    pub page: Option<i64>,
+    pub size: Option<i64>
+}
