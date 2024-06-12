@@ -1,13 +1,12 @@
 use std::vec::IntoIter;
-use diesel::{ExpressionMethods, PgConnection, QueryDsl, QueryResult, RunQueryDsl};
+use diesel::{PgConnection, QueryDsl, RunQueryDsl};
+use diesel::r2d2::ConnectionManager;
+use r2d2::Pool;
 use uuid::Uuid;
-use crate::infrastructure::database::connection::get_connection;
-use crate::infrastructure::database::entities::User;
-use crate::infrastructure::database::schemas::users::dsl::{users, external_id};
+use crate::infrastructure::database::entities::UserDatabaseEntity;
+use crate::infrastructure::database::schemas::users::dsl::{users};
 
-pub trait Repository<T, K> {
-
-    fn new() -> Self;
+pub trait DatabaseRepository<T, K> {
 
     //fn create(&self, entity: &T) -> QueryResult<T>;
 
@@ -20,15 +19,22 @@ pub trait Repository<T, K> {
     // fn delete(&self, id: K) -> QueryResult<usize>;
 }
 
-pub struct UserRepository {
-    conn: PgConnection,
+#[derive(Clone)]
+pub struct UserDatabaseRepository {
+    connection: Pool<ConnectionManager<PgConnection>>,
 }
 
-impl Repository<User, Uuid> for UserRepository{
-
-    fn new() -> Self {
-        Self{conn: get_connection() }
+impl UserDatabaseRepository {
+    pub fn new(
+        connection: Pool<ConnectionManager<PgConnection>>,
+    ) -> UserDatabaseRepository {
+        UserDatabaseRepository {
+            connection,
+        }
     }
+}
+
+impl DatabaseRepository<UserDatabaseEntity, Uuid> for UserDatabaseRepository {
 
     // fn create(&self, new_user: &User) -> QueryResult<User> {
     //     diesel::insert_into(users)
@@ -36,16 +42,16 @@ impl Repository<User, Uuid> for UserRepository{
     //         .get_result(self.conn)
     // }
 
-    fn find_all(&mut self, size: Option<i64>, page: Option<i64>) -> IntoIter<User> {
+    fn find_all(&mut self, size: Option<i64>, page: Option<i64>) -> IntoIter<UserDatabaseEntity> {
         let limit = size.unwrap_or(10);
         let offset = page.unwrap_or(0) * limit;
         let results = users
             .limit(limit)
             .offset(offset)
-            .load::<User>(&mut self.conn)
+            .load::<UserDatabaseEntity>(&mut self.connection.get().unwrap())
             .expect("Error loading users");
 
-        results.into_iter().collect::<Vec<_>>().into_iter()
+        results.into_iter()
     }
 
     // fn find_one_by_id(&self, user_id: Uuid) -> QueryResult<User> {

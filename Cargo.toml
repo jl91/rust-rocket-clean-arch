@@ -1,6 +1,6 @@
 [package]
 name = "crud-pessoa"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
 
 [dependencies]
@@ -8,8 +8,9 @@ rocket = "0.5.1"
 chrono = "0.4.38"
 serde = "1.0.203"
 serde_json = "1.0.117"
-diesel = { version = "2.2.0", features = ["postgres", "chrono", "uuid"] }
+diesel = { version = "2.2.0", features = ["postgres", "chrono", "uuid", "r2d2"] }
 dotenvy = "0.15.7"
+r2d2 = "0.8.10"
 
 [dependencies.uuid]
 version = "1.8.0"

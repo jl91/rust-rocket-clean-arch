@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 #[derive(Queryable, Insertable)]
 #[diesel(table_name = users)]
-pub struct User {
+pub struct UserDatabaseEntity {
     pub id: i64,
     pub external_id: Uuid,
     pub username: String,
@@ -17,7 +17,7 @@ pub struct User {
 
 #[derive(Queryable, Insertable)]
 #[diesel(table_name = emails)]
-pub struct Email {
+pub struct EmailDatabaseEntity {
     pub id: i64,
     pub user_id: i64,
     pub email: String,
@@ -26,7 +26,7 @@ pub struct Email {
 
 #[derive(Queryable, Insertable)]
 #[diesel(table_name = phones)]
-pub struct Phone {
+pub struct PhoneDatabaseEntity {
     pub id: i64,
     pub user_id: i64,
     pub phone: String,
