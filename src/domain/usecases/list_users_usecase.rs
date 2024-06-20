@@ -1,25 +1,32 @@
+use std::sync::{Arc, Mutex};
 use crate::domain::shared::UsecaseSpecification;
 use crate::domain::entities::{QueryRequestDomainEntity, UserDomainEntity};
 use crate::domain::shared::repositories::UserDomainRepository;
 
+#[derive(Clone)]
 pub struct ListUsersUsecase {
-    user_domain_repository: Box<dyn UserDomainRepository>,
+    user_domain_repository: Arc<Mutex<dyn UserDomainRepository>>,
 }
 
 impl ListUsersUsecase {
-    pub fn new(user_domain_repository: Box<dyn UserDomainRepository>) -> ListUsersUsecase {
+    pub fn new(user_domain_repository: Arc<Mutex<dyn UserDomainRepository>>) -> Self {
         ListUsersUsecase { user_domain_repository }
     }
 }
 
-impl UsecaseSpecification<QueryRequestDomainEntity, Vec<UserDomainEntity>> for ListUsersUsecase {
+impl UsecaseSpecification<QueryRequestDomainEntity, Result<Vec<UserDomainEntity>, ()>> for ListUsersUsecase {
     fn execute(
         &self,
         query_request_domain_entity: QueryRequestDomainEntity,
-    ) -> Vec<UserDomainEntity> {
-        self.user_domain_repository.find_all(
-            query_request_domain_entity.size,
-            query_request_domain_entity.page,
+    ) -> Result<Vec<UserDomainEntity>, ()> {
+        Ok(
+            self.user_domain_repository
+                .lock()
+                .unwrap()
+                .find_all(
+                    query_request_domain_entity.size,
+                    query_request_domain_entity.page,
+                )
         )
     }
 }

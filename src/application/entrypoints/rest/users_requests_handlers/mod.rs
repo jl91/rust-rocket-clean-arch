@@ -1,12 +1,16 @@
 use std::fmt::format;
+use std::sync::Arc;
 use uuid::Uuid;
-use rocket::{get, post, put, delete, http::Status, Response};
+use rocket::{get, post, put, delete, http::Status, Response, State};
 use rocket::http::ContentType;
 use rocket::response::content;
 use serde_json::{json, Value};
+use crate::application::repositories_impls::UserDomainRepositoryImpl;
+use crate::application::state::AppState;
 use crate::domain::entities::{QueryRequestDomainEntity, UserDomainEntity};
-// use crate::domain::shared::UsecaseSpecification;
-// use crate::domain::usecases::list_users_usecase::ListUsersUsecase;
+use crate::domain::shared::UsecaseSpecification;
+use crate::domain::usecases::list_users_usecase::ListUsersUsecase;
+use crate::infrastructure::database::repositories::UserDatabaseRepository;
 
 
 #[post("/users")]
@@ -18,21 +22,22 @@ pub fn new_user() -> content::RawJson<&'static str> {
 pub fn get_all(
     page: Option<i64>,
     size: Option<i64>,
-    // list_users_usecase: Inject<Dependencies>
+    app_state: AppState,
 ) -> content::RawJson<String> {
-    // let data = list_users_usecase.execute(
-    //     QueryRequestDomainEntity{
-    //         page,
-    //         size
-    //     }
-    // );
+    let usercase = app_state.di_container.resolve::<ListUsersUsecase>().unwrap();
 
-    // let data_json = serde_json::to_string(&data)
-    //     .expect("Failed to serialize users to JSON");
-    //
-    // content::RawJson(data_json)
-    content::RawJson(format!("{{\"message\": \"test get one user by id {}\"}}", ""))
+    let data = usercase.execute(
+        QueryRequestDomainEntity {
+            page,
+            size,
+        }
+    );
 
+    let data_json = serde_json::to_string(&data.unwrap())
+        .expect("Failed to serialize users to JSON");
+
+    content::RawJson(data_json)
+    // content::RawJson(format!("{{\"message\": \"test get one user by id {}\"}}", ""))
 }
 
 #[get("/users/<id>")]

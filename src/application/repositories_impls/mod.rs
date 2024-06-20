@@ -1,15 +1,18 @@
+use std::sync::Arc;
 use crate::application::mappers::fromUserDatabaseEntityToDomain;
 use crate::domain::entities::UserDomainEntity;
 use crate::domain::shared::repositories::UserDomainRepository;
 use crate::infrastructure::database::repositories::{DatabaseRepository, UserDatabaseRepository};
 
+
+#[derive(Clone, Debug)]
 pub struct UserDomainRepositoryImpl {
-    user_database_repository: UserDatabaseRepository,
+    user_database_repository: Arc<UserDatabaseRepository>,
 }
 
 impl UserDomainRepositoryImpl {
     pub fn new(
-        user_database_repository: UserDatabaseRepository
+        user_database_repository: Arc<UserDatabaseRepository>
     ) -> UserDomainRepositoryImpl {
         UserDomainRepositoryImpl {
             user_database_repository,

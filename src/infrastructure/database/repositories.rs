@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use std::vec::IntoIter;
 use diesel::{PgConnection, QueryDsl, RunQueryDsl};
 use diesel::r2d2::ConnectionManager;
@@ -10,7 +11,7 @@ pub trait DatabaseRepository<T, K> {
 
     //fn create(&self, entity: &T) -> QueryResult<T>;
 
-    fn find_all(&mut self, size: Option<i64>, page: Option<i64>) -> IntoIter<T>;
+    fn find_all(&self, size: Option<i64>, page: Option<i64>) -> IntoIter<T>;
 
     // fn find_one_by_id(&self, id: K) -> QueryResult<T>;
     //
@@ -19,14 +20,14 @@ pub trait DatabaseRepository<T, K> {
     // fn delete(&self, id: K) -> QueryResult<usize>;
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct UserDatabaseRepository {
     connection: Pool<ConnectionManager<PgConnection>>,
 }
 
 impl UserDatabaseRepository {
     pub fn new(
-        connection: Pool<ConnectionManager<PgConnection>>,
+        connection: Arc<Pool<ConnectionManager<PgConnection>>>,
     ) -> UserDatabaseRepository {
         UserDatabaseRepository {
             connection,
@@ -42,7 +43,7 @@ impl DatabaseRepository<UserDatabaseEntity, Uuid> for UserDatabaseRepository {
     //         .get_result(self.conn)
     // }
 
-    fn find_all(&mut self, size: Option<i64>, page: Option<i64>) -> IntoIter<UserDatabaseEntity> {
+    fn find_all(&self, size: Option<i64>, page: Option<i64>) -> IntoIter<UserDatabaseEntity> {
         let limit = size.unwrap_or(10);
         let offset = page.unwrap_or(0) * limit;
         let results = users
