@@ -22,7 +22,7 @@ pub struct UserDomainEntity {
 
 
 #[derive(Deserialize, Debug)]
-pub struct QueryRequestDomainEntity{
+pub struct GenericQueryDomainEntity {
     pub page: Option<i64>,
     pub size: Option<i64>
 }

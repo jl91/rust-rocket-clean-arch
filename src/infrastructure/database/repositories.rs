@@ -3,11 +3,13 @@ use std::vec::IntoIter;
 use diesel::{PgConnection, QueryDsl, RunQueryDsl};
 use diesel::r2d2::ConnectionManager;
 use r2d2::Pool;
+use shaku::{Component, Interface};
 use uuid::Uuid;
+use crate::infrastructure::database::connection::ConnectionFactory;
 use crate::infrastructure::database::entities::UserDatabaseEntity;
 use crate::infrastructure::database::schemas::users::dsl::{users};
 
-pub trait DatabaseRepository<T, K> {
+pub trait DatabaseRepository<T, K> : Interface {
 
     //fn create(&self, entity: &T) -> QueryResult<T>;
 
@@ -20,19 +22,10 @@ pub trait DatabaseRepository<T, K> {
     // fn delete(&self, id: K) -> QueryResult<usize>;
 }
 
-#[derive(Clone, Debug)]
+#[derive(Component)]
+#[shaku(interface = DatabaseRepository<UserDatabaseEntity, Uuid>)]
 pub struct UserDatabaseRepository {
-    connection: Pool<ConnectionManager<PgConnection>>,
-}
-
-impl UserDatabaseRepository {
-    pub fn new(
-        connection: Arc<Pool<ConnectionManager<PgConnection>>>,
-    ) -> UserDatabaseRepository {
-        UserDatabaseRepository {
-            connection,
-        }
-    }
+    connection_factory: Arc<dyn ConnectionFactory>,
 }
 
 impl DatabaseRepository<UserDatabaseEntity, Uuid> for UserDatabaseRepository {
@@ -49,7 +42,7 @@ impl DatabaseRepository<UserDatabaseEntity, Uuid> for UserDatabaseRepository {
         let results = users
             .limit(limit)
             .offset(offset)
-            .load::<UserDatabaseEntity>(&mut self.connection.get().unwrap())
+            .load::<UserDatabaseEntity>(&mut self.connection_factory.connect().get().unwrap())
             .expect("Error loading users");
 
         results.into_iter()
