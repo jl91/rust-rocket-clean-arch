@@ -1,16 +1,17 @@
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc};
 use crate::domain::shared::UsecaseSpecification;
 use crate::domain::entities::{GenericQueryDomainEntity, UserDomainEntity};
 use crate::domain::shared::repositories::UserDomainRepository;
 
-#[derive(Clone)]
 pub struct ListUsersUsecase {
     user_domain_repository: Arc<dyn UserDomainRepository>,
 }
 
 impl ListUsersUsecase {
     pub fn new(user_domain_repository: Arc<dyn UserDomainRepository>) -> Self {
-        ListUsersUsecase { user_domain_repository }
+        Self {
+            user_domain_repository
+        }
     }
 }
 

@@ -3,13 +3,12 @@ use std::vec::IntoIter;
 use diesel::{PgConnection, QueryDsl, RunQueryDsl};
 use diesel::r2d2::ConnectionManager;
 use r2d2::Pool;
-use shaku::{Component, Interface};
 use uuid::Uuid;
 use crate::infrastructure::database::connection::ConnectionFactory;
 use crate::infrastructure::database::entities::UserDatabaseEntity;
 use crate::infrastructure::database::schemas::users::dsl::{users};
 
-pub trait DatabaseRepository<T, K> : Interface {
+pub trait DatabaseRepository<T, K> {
 
     //fn create(&self, entity: &T) -> QueryResult<T>;
 
@@ -22,10 +21,16 @@ pub trait DatabaseRepository<T, K> : Interface {
     // fn delete(&self, id: K) -> QueryResult<usize>;
 }
 
-#[derive(Component)]
-#[shaku(interface = DatabaseRepository<UserDatabaseEntity, Uuid>)]
 pub struct UserDatabaseRepository {
     connection_factory: Arc<dyn ConnectionFactory>,
+}
+
+impl UserDatabaseRepository {
+    pub fn new(connection_factory: Arc<dyn ConnectionFactory>) -> Self {
+        Self {
+            connection_factory
+        }
+    }
 }
 
 impl DatabaseRepository<UserDatabaseEntity, Uuid> for UserDatabaseRepository {

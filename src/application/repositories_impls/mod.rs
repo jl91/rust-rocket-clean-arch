@@ -1,15 +1,20 @@
 use std::sync::Arc;
-use shaku::Component;
 use crate::application::mappers::fromUserDatabaseEntityToDomain;
 use crate::domain::entities::UserDomainEntity;
 use crate::domain::shared::repositories::UserDomainRepository;
 use crate::infrastructure::database::repositories::{DatabaseRepository, UserDatabaseRepository};
 
 
-#[derive(Component)]
-#[shaku(interface = UserDomainRepository)]
 pub struct UserDomainRepositoryImpl {
     user_database_repository: Arc<UserDatabaseRepository>,
+}
+
+impl UserDomainRepositoryImpl {
+    pub fn new(user_database_repository: Arc<UserDatabaseRepository>) -> Self {
+        Self {
+            user_database_repository,
+        }
+    }
 }
 
 impl UserDomainRepository for UserDomainRepositoryImpl {

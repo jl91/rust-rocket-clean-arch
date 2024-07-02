@@ -5,17 +5,20 @@ mod application;
 mod domain;
 mod infrastructure;
 
-use shaku::module;
+use std::sync::Arc;
+use uuid::Uuid;
 use application::entrypoints::rest::users_requests_handlers::*;
 use crate::application::repositories_impls::UserDomainRepositoryImpl;
 use crate::domain::shared::repositories::UserDomainRepository;
-use crate::infrastructure::database::repositories::UserDatabaseRepository;
+use crate::domain::usecases::list_users_usecase::ListUsersUsecase;
+use crate::infrastructure::database::connection::{ConnectionFactory, ConnectionFactoryImpl};
+use crate::infrastructure::database::entities::UserDatabaseEntity;
+use crate::infrastructure::database::repositories::{DatabaseRepository, UserDatabaseRepository};
 
 #[launch]
 fn rocket() -> _ {
-    let diModule = DiModule::builder().build();
     rocket::build()
-        .manage(Box::new(diModule))
+        .manage(DiContainer::new())
         .mount("/", routes![
         new_user,
         get_all,
@@ -25,16 +28,30 @@ fn rocket() -> _ {
     ])
 }
 
-module! {
-    pub DiModule {
-        components = [
-            UserDomainRepositoryImpl,
-            UserDatabaseRepository
-        ],
-        providers = [
+struct DiContainer;
 
-        ]
+impl DiContainer {
+    fn new() -> Self {
+        Self
     }
+
+    fn get_connection_factory(&self) -> Arc<dyn ConnectionFactory> {
+        Arc::new(ConnectionFactoryImpl::new())
+    }
+
+    // Database Repositories
+    fn user_database_instance(&self) -> Arc<UserDatabaseRepository> {
+        Arc::new(UserDatabaseRepository::new(self.get_connection_factory().clone()))
+    }
+
+    // Domain Repositories
+    fn user_domain_instance(&self) -> Arc<dyn UserDomainRepository> {
+        Arc::new(UserDomainRepositoryImpl::new(self.user_database_instance()))
+    }
+
+    // Usecases
+    fn list_users_usecase_instance(&self) -> ListUsersUsecase {
+        ListUsersUsecase::new(self.user_domain_instance())
+    }
+
 }
-
-

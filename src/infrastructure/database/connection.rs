@@ -1,14 +1,17 @@
 use diesel::pg::PgConnection;
 use diesel::r2d2::{self, ConnectionManager};
 use r2d2::Pool;
-use shaku::{Component, Interface};
 
-#[derive(Debug, Component)]
-#[shaku(interface = ConnectionFactory)]
 pub struct ConnectionFactoryImpl;
 
-pub trait ConnectionFactory: Interface {
+pub trait ConnectionFactory {
     fn connect(&self) -> Pool<ConnectionManager<PgConnection>>;
+}
+
+impl ConnectionFactoryImpl {
+    pub fn new() -> Self {
+        Self
+    }
 }
 
 impl ConnectionFactory for ConnectionFactoryImpl{
