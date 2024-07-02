@@ -16,8 +16,8 @@ pub struct UserDomainEntity {
     pub id: String,
     pub username: String,
     pub password: String,
-    pub created_at: String,
-    pub updated_at: String,
+    pub created_at: Option<String>,
+    pub updated_at: Option<String>,
 }
 
 

@@ -6,13 +6,13 @@ mod domain;
 mod infrastructure;
 
 use std::sync::Arc;
-use uuid::Uuid;
-use application::entrypoints::rest::users_requests_handlers::*;
+use application::entrypoints::rest;
+use crate::application::entrypoints::rest::users_requests_handlers::{delete_user, get_all, get_one, new_user, update_user};
 use crate::application::repositories_impls::UserDomainRepositoryImpl;
 use crate::domain::shared::repositories::UserDomainRepository;
 use crate::domain::usecases::list_users_usecase::ListUsersUsecase;
+use crate::domain::usecases::create_user_usecase::CreateUserUsecase;
 use crate::infrastructure::database::connection::{ConnectionFactory, ConnectionFactoryImpl};
-use crate::infrastructure::database::entities::UserDatabaseEntity;
 use crate::infrastructure::database::repositories::{DatabaseRepository, UserDatabaseRepository};
 
 #[launch]
@@ -52,6 +52,10 @@ impl DiContainer {
     // Usecases
     fn list_users_usecase_instance(&self) -> ListUsersUsecase {
         ListUsersUsecase::new(self.user_domain_instance())
+    }
+
+    fn create_user_usecase_instance(&self) -> CreateUserUsecase {
+        CreateUserUsecase::new(self.user_domain_instance())
     }
 
 }
