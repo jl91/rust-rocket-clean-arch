@@ -1,5 +1,5 @@
-use crate::application::entrypoints::rest::UserRequestDTO;
-use crate::domain::entities::UserDomainEntity;
+use crate::application::entrypoints::rest::NewUserRequestDTO;
+use crate::domain::entities::{NewUserDomainEntity, UserDomainEntity};
 use crate::infrastructure::database::entities::UserDatabaseEntity;
 
 pub fn from_user_database_entity_to_domain(entity: UserDatabaseEntity) -> UserDomainEntity {
@@ -15,27 +15,9 @@ pub fn from_user_database_entity_to_domain(entity: UserDatabaseEntity) -> UserDo
     }
 }
 
-// pub fn from_user_dtoto_domain_entity(dto: UserRequestDTO) -> UserDomainEntity {
-//     UserDomainEntity {
-//         id: None,
-//         username: dto.username,
-//         password: dto.password,
-//         created_at: None,
-//         updated_at: None,
-//     }
-// }
-
-// pub fn from_domain_entity_to_database_entity(entity: UserDomainEntity) -> UserDatabaseEntity {
-//     UserDatabaseEntity {
-//         id: 0,
-//         external_id: entity.id.unwrap(),
-//         username: entity.username,
-//         password: entity.password,
-//         created_at: chrono::NaiveDateTime::parse_from_str(entity.created_at.unwrap().as_str(), "%Y-%m-%d").unwrap(),
-//         updated_at: match entity.updated_at {
-//             Some(date) => Option::from(chrono::NaiveDateTime::parse_from_str(date.as_str(), "%Y-%m-%d").unwrap()),
-//             None => None,
-//         },
-//         deleted_at: None,
-//     }
-// }
+pub fn new_user_from_dto_to_domain(dto: NewUserRequestDTO) -> NewUserDomainEntity {
+    NewUserDomainEntity {
+        username: dto.username,
+        password: dto.password
+    }
+}

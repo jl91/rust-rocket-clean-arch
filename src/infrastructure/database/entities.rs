@@ -3,7 +3,8 @@ use crate::infrastructure::database::schemas::{users, emails, phones};
 use diesel::{Queryable, Insertable};
 use uuid::Uuid;
 
-#[derive(Queryable, Insertable)]
+#[derive(Default, Debug, Queryable, Insertable)]
+#[diesel(primary_key(id))]
 #[diesel(table_name = users)]
 pub struct UserDatabaseEntity {
     pub id: i64,

@@ -1,16 +1,15 @@
-use std::result;
 use std::sync::Arc;
 use std::vec::IntoIter;
+use chrono::{NaiveDateTime, Utc};
 use diesel::{ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
 use uuid::Uuid;
-use crate::domain::entities::UserDomainEntity;
 use crate::infrastructure::database::connection::ConnectionFactory;
 use crate::infrastructure::database::entities::UserDatabaseEntity;
 use crate::infrastructure::database::schemas::users::dsl::{users};
-use crate::infrastructure::database::schemas::users::external_id;
+use crate::infrastructure::database::schemas::users::{created_at, external_id, password, username};
 
 pub trait DatabaseRepository<T, K> {
-    // fn create(&self, entity: T) -> QueryResult<T>;
+    fn create(&self, entity: T) -> QueryResult<T>;
 
     fn find_all(&self, size: Option<i64>, page: Option<i64>) -> IntoIter<T>;
 
@@ -34,16 +33,15 @@ impl UserDatabaseRepository {
 }
 
 impl DatabaseRepository<UserDatabaseEntity, Uuid> for UserDatabaseRepository {
-    // fn create(&self, new_user: &UserDomainEntity) -> QueryResult<UserDomainEntity> {
-    //     let result = diesel::insert_into(users)
-    //         .values(&new_user)
-    //         .returning(users)
-    //         .get_result(&mut self.connection_factory.connect().get().unwrap())
-    //         .unwrap()
-    //         .expect("Error saving new post");
-    //
-    //     result.into()
-    // }
+    fn create(&self, new_user: UserDatabaseEntity) -> QueryResult<UserDatabaseEntity> {
+        diesel::insert_into(users)
+            .values((
+                username.eq(new_user.username),
+                password.eq(new_user.password),
+                created_at.eq(Utc::now().naive_utc()),
+            ))
+            .get_result::<UserDatabaseEntity>(&mut self.connection_factory.connect().get().unwrap())
+    }
 
     fn find_all(&self, size: Option<i64>, page: Option<i64>) -> IntoIter<UserDatabaseEntity> {
         let limit = size.unwrap_or(10);

@@ -9,30 +9,31 @@ use rocket::response::content;
 use rocket::response::content::RawJson;
 use crate::application::repositories_impls::UserDomainRepositoryImpl;
 use crate::{DiContainer};
-use crate::application::entrypoints::rest::UserRequestDTO;
-// use crate::application::mappers::from_user_dtoto_domain_entity;
+use crate::application::entrypoints::rest::NewUserRequestDTO;
 use crate::domain::entities::{GenericQueryDomainEntity, UserDomainEntity};
 use crate::domain::shared::UsecaseSpecification;
 use crate::domain::usecases::list_users_usecase::ListUsersUsecase;
 use crate::infrastructure::database::repositories::UserDatabaseRepository;
 use rocket::serde::{Deserialize, json::Json};
+use crate::application::mappers::new_user_from_dto_to_domain;
 
-// #[post("/users",format="json", data = "<new_user>")]
-// pub fn new_user(
-//     new_user: Json<UserRequestDTO>,
-//     state: &State<DiContainer>
-// ) -> RawJson<String> {
-//
-//     let user_domain_entity = from_user_dtoto_domain_entity(new_user.0);
-//
-//     let data =  state.create_user_usecase_instance()
-//         .execute(user_domain_entity);
-//
-//     let data_json = serde_json::to_string(&data.unwrap())
-//         .expect("Failed to serialize users to JSON");
-//
-//     RawJson(data_json)
-// }
+#[post("/users",format="json", data = "<new_user>")]
+pub fn new_user(
+    new_user: Json<NewUserRequestDTO>,
+    state: &State<DiContainer>
+) -> RawJson<String> {
+
+    let new_user_domain_entity = new_user_from_dto_to_domain(new_user.0);
+
+    let data =  state.create_user_usecase_instance()
+        .execute(new_user_domain_entity)
+        .expect("Failed to create user");
+
+    let data_json = serde_json::to_string(&data)
+        .expect("Failed to serialize users to JSON");
+
+    RawJson(data_json)
+}
 
 #[get("/users?<page>&<size>")]
 pub fn get_all(

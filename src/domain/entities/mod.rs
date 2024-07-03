@@ -12,6 +12,12 @@ pub struct PhoneDomainEntity {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct NewUserDomainEntity {
+    pub username: String,
+    pub password: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UserDomainEntity {
     pub id: String,
     pub username: String,

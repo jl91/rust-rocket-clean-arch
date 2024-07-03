@@ -6,8 +6,7 @@ mod domain;
 mod infrastructure;
 
 use std::sync::Arc;
-use application::entrypoints::rest;
-use crate::application::entrypoints::rest::users_requests_handlers::{delete_user, get_all, get_one, update_user};
+use crate::application::entrypoints::rest::users_requests_handlers::{delete_user, get_all, get_one, new_user, update_user};
 use crate::application::repositories_impls::UserDomainRepositoryImpl;
 use crate::domain::shared::repositories::UserDomainRepository;
 use crate::domain::usecases::list_users_usecase::ListUsersUsecase;
@@ -21,7 +20,7 @@ fn rocket() -> _ {
     rocket::build()
         .manage(DiContainer::new())
         .mount("/", routes![
-        // new_user,
+        new_user,
         get_all,
         get_one,
         update_user,
