@@ -7,11 +7,12 @@ mod infrastructure;
 
 use std::sync::Arc;
 use application::entrypoints::rest;
-use crate::application::entrypoints::rest::users_requests_handlers::{delete_user, get_all, get_one, new_user, update_user};
+use crate::application::entrypoints::rest::users_requests_handlers::{delete_user, get_all, get_one, update_user};
 use crate::application::repositories_impls::UserDomainRepositoryImpl;
 use crate::domain::shared::repositories::UserDomainRepository;
 use crate::domain::usecases::list_users_usecase::ListUsersUsecase;
 use crate::domain::usecases::create_user_usecase::CreateUserUsecase;
+use crate::domain::usecases::one_users_usecase::OneUsersUsecase;
 use crate::infrastructure::database::connection::{ConnectionFactory, ConnectionFactoryImpl};
 use crate::infrastructure::database::repositories::{DatabaseRepository, UserDatabaseRepository};
 
@@ -20,7 +21,7 @@ fn rocket() -> _ {
     rocket::build()
         .manage(DiContainer::new())
         .mount("/", routes![
-        new_user,
+        // new_user,
         get_all,
         get_one,
         update_user,
@@ -56,6 +57,10 @@ impl DiContainer {
 
     fn create_user_usecase_instance(&self) -> CreateUserUsecase {
         CreateUserUsecase::new(self.user_domain_instance())
+    }
+
+    fn one_user_usecase_instance(&self) -> OneUsersUsecase {
+        OneUsersUsecase::new(self.user_domain_instance())
     }
 
 }
