@@ -9,23 +9,22 @@ use rocket::response::content;
 use rocket::response::content::RawJson;
 use crate::application::repositories_impls::UserDomainRepositoryImpl;
 use crate::{DiContainer};
-use crate::application::entrypoints::rest::NewUserRequestDTO;
-use crate::domain::entities::{GenericQueryDomainEntity, UserDomainEntity};
+use crate::application::entrypoints::rest::{NewUserRequestDTO, UpdateUserRequestDTO};
+use crate::domain::entities::{GenericQueryDomainEntity, UpdateUserDomainEntity, UserDomainEntity};
 use crate::domain::shared::UsecaseSpecification;
 use crate::domain::usecases::list_users_usecase::ListUsersUsecase;
 use crate::infrastructure::database::repositories::UserDatabaseRepository;
 use rocket::serde::{Deserialize, json::Json};
-use crate::application::mappers::new_user_from_dto_to_domain;
+use crate::application::mappers::{new_user_from_dto_to_domain, update_user_from_dto_to_domain};
 
-#[post("/users",format="json", data = "<new_user>")]
+#[post("/users", format = "json", data = "<new_user>")]
 pub fn new_user(
     new_user: Json<NewUserRequestDTO>,
-    state: &State<DiContainer>
+    state: &State<DiContainer>,
 ) -> RawJson<String> {
-
     let new_user_domain_entity = new_user_from_dto_to_domain(new_user.0);
 
-    let data =  state.create_user_usecase_instance()
+    let data = state.create_user_usecase_instance()
         .execute(new_user_domain_entity)
         .expect("Failed to create user");
 
@@ -39,15 +38,15 @@ pub fn new_user(
 pub fn get_all(
     page: Option<i64>,
     size: Option<i64>,
-    state: &State<DiContainer>
+    state: &State<DiContainer>,
 ) -> content::RawJson<String> {
     let data = state.list_users_usecase_instance()
         .execute(
-        GenericQueryDomainEntity {
-            page,
-            size,
-        }
-    );
+            GenericQueryDomainEntity {
+                page,
+                size,
+            }
+        );
 
     let data_json = serde_json::to_string(&data.unwrap())
         .expect("Failed to serialize users to JSON");
@@ -58,7 +57,7 @@ pub fn get_all(
 #[get("/users/<id>")]
 pub fn get_one(
     id: String,
-    state: &State<DiContainer>
+    state: &State<DiContainer>,
 ) -> content::RawJson<String> {
     let data = state.one_user_usecase_instance()
         .execute(
@@ -71,9 +70,24 @@ pub fn get_one(
     content::RawJson(data_json)
 }
 
-#[put("/users/<id>")]
-pub fn update_user(id: String) -> content::RawJson<String> {
-    content::RawJson(format!("{{\"message\": \"test update one user by id {}\"}}", id.to_string()))
+#[put("/users/<id>", format = "json", data = "<update_user>")]
+pub fn update_user(
+    id: String,
+    update_user: Json<UpdateUserRequestDTO>,
+    state: &State<DiContainer>,
+) -> RawJson<String> {
+
+    let data = update_user_from_dto_to_domain(id, update_user.0);
+
+    let data = state.update_user_usecase_instance()
+        .execute(
+            data
+        );
+
+    let data_json = serde_json::to_string(&data.unwrap())
+        .expect("Failed to serialize users to JSON");
+
+    content::RawJson(data_json)
 }
 
 #[delete("/users/<id>")]

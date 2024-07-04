@@ -10,3 +10,9 @@ pub struct NewUserRequestDTO {
     pub username: String,
     pub password: String,
 }
+
+#[derive(Deserialize)]
+pub struct UpdateUserRequestDTO {
+    pub username: String,
+    pub password: String,
+}

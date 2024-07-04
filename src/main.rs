@@ -11,7 +11,8 @@ use crate::application::repositories_impls::UserDomainRepositoryImpl;
 use crate::domain::shared::repositories::UserDomainRepository;
 use crate::domain::usecases::list_users_usecase::ListUsersUsecase;
 use crate::domain::usecases::create_user_usecase::CreateUserUsecase;
-use crate::domain::usecases::one_users_usecase::OneUsersUsecase;
+use crate::domain::usecases::one_user_usecase::OneUsersUsecase;
+use crate::domain::usecases::update_user_usercase::UpdateUserUsecase;
 use crate::infrastructure::database::connection::{ConnectionFactory, ConnectionFactoryImpl};
 use crate::infrastructure::database::repositories::{DatabaseRepository, UserDatabaseRepository};
 
@@ -60,6 +61,10 @@ impl DiContainer {
 
     fn one_user_usecase_instance(&self) -> OneUsersUsecase {
         OneUsersUsecase::new(self.user_domain_instance())
+    }
+
+    fn update_user_usecase_instance(&self) -> UpdateUserUsecase {
+        UpdateUserUsecase::new(self.user_domain_instance())
     }
 
 }

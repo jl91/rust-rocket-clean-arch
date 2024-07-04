@@ -1,12 +1,12 @@
 use std::sync::Arc;
 use std::vec::IntoIter;
-use chrono::{NaiveDateTime, Utc};
+use chrono::{Utc};
 use diesel::{ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
 use uuid::Uuid;
 use crate::infrastructure::database::connection::ConnectionFactory;
 use crate::infrastructure::database::entities::UserDatabaseEntity;
 use crate::infrastructure::database::schemas::users::dsl::{users};
-use crate::infrastructure::database::schemas::users::{created_at, external_id, password, username};
+use crate::infrastructure::database::schemas::users::{created_at, external_id, password, updated_at, username};
 
 pub trait DatabaseRepository<T, K> {
     fn create(&self, entity: T) -> QueryResult<T>;
@@ -14,8 +14,8 @@ pub trait DatabaseRepository<T, K> {
     fn find_all(&self, size: Option<i64>, page: Option<i64>) -> IntoIter<T>;
 
     fn find_one_by_id(&self, id: K) -> QueryResult<T>;
-    //
-    // // fn update(&self, entity: &T) -> QueryResult<T>;
+
+    fn update(&self, entity: T) -> QueryResult<T>;
     //
     // fn delete(&self, id: K) -> QueryResult<usize>;
 }
@@ -60,11 +60,15 @@ impl DatabaseRepository<UserDatabaseEntity, Uuid> for UserDatabaseRepository {
             .first(&mut self.connection_factory.connect().get().unwrap())
     }
 
-    // fn update(&self, updated_user: &User) -> QueryResult<User> {
-    //     diesel::update(users.filter(updated_user.external_id))
-    //         .set()
-    //         .get_result(self.conn)
-    // }
+    fn update(&self, updated_user: UserDatabaseEntity) -> QueryResult<UserDatabaseEntity> {
+        diesel::update(users.filter(external_id.eq(updated_user.external_id)))
+            .set((
+                username.eq(updated_user.username),
+                password.eq(updated_user.password),
+                updated_at.eq(Utc::now().naive_utc()),
+            ))
+            .get_result(&mut self.connection_factory.connect().get().unwrap())
+    }
 
     // fn delete(&self, user_id: Uuid) -> QueryResult<usize> {
     //     diesel::delete(users.filter(external_id.eq(user_id)))

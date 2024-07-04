@@ -1,5 +1,6 @@
-use crate::application::entrypoints::rest::NewUserRequestDTO;
-use crate::domain::entities::{NewUserDomainEntity, UserDomainEntity};
+use uuid::Uuid;
+use crate::application::entrypoints::rest::{NewUserRequestDTO, UpdateUserRequestDTO};
+use crate::domain::entities::{NewUserDomainEntity, UpdateUserDomainEntity, UserDomainEntity};
 use crate::infrastructure::database::entities::UserDatabaseEntity;
 
 pub fn from_user_database_entity_to_domain(entity: UserDatabaseEntity) -> UserDomainEntity {
@@ -17,6 +18,15 @@ pub fn from_user_database_entity_to_domain(entity: UserDatabaseEntity) -> UserDo
 
 pub fn new_user_from_dto_to_domain(dto: NewUserRequestDTO) -> NewUserDomainEntity {
     NewUserDomainEntity {
+        username: dto.username,
+        password: dto.password
+    }
+}
+
+
+pub fn update_user_from_dto_to_domain(id: String, dto: UpdateUserRequestDTO) -> UpdateUserDomainEntity {
+    UpdateUserDomainEntity {
+        id: Uuid::parse_str(&*id).unwrap(),
         username: dto.username,
         password: dto.password
     }

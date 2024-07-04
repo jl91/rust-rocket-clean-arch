@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 use rocket::serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 pub struct EmailDomainEntity {
     email: String,
@@ -13,6 +14,13 @@ pub struct PhoneDomainEntity {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct NewUserDomainEntity {
+    pub username: String,
+    pub password: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Default)]
+pub struct UpdateUserDomainEntity {
+    pub id: Uuid,
     pub username: String,
     pub password: String,
 }
