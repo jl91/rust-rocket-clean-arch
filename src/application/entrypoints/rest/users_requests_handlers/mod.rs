@@ -91,6 +91,15 @@ pub fn update_user(
 }
 
 #[delete("/users/<id>")]
-pub fn delete_user(id: String) -> content::RawJson<String> {
-    content::RawJson(format!("{{\"message\": \"test delete one user by id {}\"}}", id.to_string()))
+pub fn delete_user(
+    id: String,
+    state: &State<DiContainer>,
+) -> RawJson<String> {
+
+    let data = state.delete_user_usecase_instance()
+        .execute(
+            Uuid::parse_str(&id).unwrap()
+        );
+
+   RawJson(format!("{{\"ok\": {:?}}}", data.unwrap()))
 }

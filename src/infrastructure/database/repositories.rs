@@ -2,11 +2,12 @@ use std::sync::Arc;
 use std::vec::IntoIter;
 use chrono::{Utc};
 use diesel::{ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
+use diesel::internal::derives::multiconnection::SelectStatementAccessor;
 use uuid::Uuid;
 use crate::infrastructure::database::connection::ConnectionFactory;
 use crate::infrastructure::database::entities::UserDatabaseEntity;
 use crate::infrastructure::database::schemas::users::dsl::{users};
-use crate::infrastructure::database::schemas::users::{created_at, external_id, password, updated_at, username};
+use crate::infrastructure::database::schemas::users::{created_at, deleted_at, external_id, password, updated_at, username};
 
 pub trait DatabaseRepository<T, K> {
     fn create(&self, entity: T) -> QueryResult<T>;
@@ -16,7 +17,9 @@ pub trait DatabaseRepository<T, K> {
     fn find_one_by_id(&self, id: K) -> QueryResult<T>;
 
     fn update(&self, entity: T) -> QueryResult<T>;
-    //
+
+    fn soft_delete(&self, id: Uuid) -> bool;
+
     // fn delete(&self, id: K) -> QueryResult<usize>;
 }
 
@@ -49,6 +52,7 @@ impl DatabaseRepository<UserDatabaseEntity, Uuid> for UserDatabaseRepository {
         let results = users
             .limit(limit)
             .offset(offset)
+            .filter(deleted_at.is_null())
             .load::<UserDatabaseEntity>(&mut self.connection_factory.connect().get().unwrap())
             .expect("Error loading users");
 
@@ -65,13 +69,17 @@ impl DatabaseRepository<UserDatabaseEntity, Uuid> for UserDatabaseRepository {
             .set((
                 username.eq(updated_user.username),
                 password.eq(updated_user.password),
-                updated_at.eq(Utc::now().naive_utc()),
+                updated_at.eq(Utc::now().naive_utc())
             ))
             .get_result(&mut self.connection_factory.connect().get().unwrap())
     }
 
-    // fn delete(&self, user_id: Uuid) -> QueryResult<usize> {
-    //     diesel::delete(users.filter(external_id.eq(user_id)))
-    //         .execute(self.conn)
-    // }
+    fn soft_delete(&self, user_id: Uuid) -> bool {
+        let entity = diesel::update(users.filter(external_id.eq(user_id)))
+                                   .set(
+                                       (deleted_at.eq(Utc::now().naive_utc()))
+                                   )
+                                   .execute(&mut self.connection_factory.connect().get().unwrap());
+        entity.is_ok()
+    }
 }

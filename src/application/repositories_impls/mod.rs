@@ -66,4 +66,9 @@ impl UserDomainRepository for UserDomainRepositoryImpl {
                 .unwrap()
         )
     }
+
+    fn soft_delete(&self, id: Uuid) -> bool {
+        self.user_database_repository
+            .soft_delete(id)
+    }
 }

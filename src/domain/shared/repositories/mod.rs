@@ -11,5 +11,6 @@ pub trait UserDomainRepository {
 
     fn update_user(&self, user_domain_entity: UpdateUserDomainEntity) -> UserDomainEntity;
 
+    fn soft_delete(&self, id: Uuid) -> bool;
 
 }
