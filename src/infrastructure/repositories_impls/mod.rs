@@ -77,12 +77,18 @@ impl UserDomainRepository for UserDomainRepositoryImpl {
     }
 }
 
-pub struct DefaultLogger;
+pub struct DefaultLogger<'a>{
+    logger: &'a  JsonLogger
+}
 
 
-impl DefaultLogger {
-    pub fn new() -> Self {
-        Self
+impl<'a> DefaultLogger<'a> {
+    pub fn new(
+        logger: &'a JsonLogger
+    ) -> Self {
+        Self{
+            logger
+        }
     }
 
     fn fabricate_log(message: &str) -> LogStruct {
@@ -98,11 +104,9 @@ impl DefaultLogger {
         }
     }
 }
-impl Logger for DefaultLogger {
+impl Logger for DefaultLogger<'_> {
     fn info(&self, message: &str) {
-        let logger = json_log::get_default_logger();
-
-        logger.info(
+        self.logger.info(
             Self::fabricate_log(message)
         )
     }
@@ -110,7 +114,7 @@ impl Logger for DefaultLogger {
     fn error(&self, message: &str) {
         let logger = json_log::get_default_logger();
 
-        logger.error(
+        self.logger.error(
             Self::fabricate_log(message)
         )
     }
@@ -118,7 +122,7 @@ impl Logger for DefaultLogger {
     fn warn(&self, message: &str) {
         let logger = json_log::get_default_logger();
 
-        logger.warn(
+        self.logger.warn(
             Self::fabricate_log(message)
         )
     }
@@ -126,7 +130,7 @@ impl Logger for DefaultLogger {
     fn debug(&self, message: &str) {
         let logger = json_log::get_default_logger();
 
-        logger.debug(
+        self.logger.debug(
             Self::fabricate_log(message)
         )
     }

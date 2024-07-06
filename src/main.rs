@@ -6,7 +6,6 @@ mod domain;
 mod infrastructure;
 
 use std::sync::Arc;
-use json_log::JsonLogger;
 use log::LevelFilter;
 use crate::application::entrypoints::rest::users_requests_handlers::{delete_user, get_all, get_one, new_user, update_user};
 use infrastructure::repositories_impls::UserDomainRepositoryImpl;
@@ -36,31 +35,43 @@ fn rocket() -> _ {
 struct DiContainer;
 
 impl DiContainer {
+
     fn new() -> Self {
         Self
     }
 
     //Logger
     fn get_custom_default_logger(&self) -> Arc<dyn domain::shared::repositories::Logger> {
-
         Arc::new(
-            infrastructure::repositories_impls::DefaultLogger::new()
+            infrastructure::repositories_impls::DefaultLogger::new(
+                json_log::get_default_logger()
+            )
         )
     }
 
     // Database connection
     fn get_connection_factory(&self) -> Arc<dyn ConnectionFactory> {
-        Arc::new(ConnectionFactoryImpl::new())
+        Arc::new(
+            ConnectionFactoryImpl::new()
+        )
     }
 
     // Database Repositories
     fn user_database_instance(&self) -> Arc<UserDatabaseRepository> {
-        Arc::new(UserDatabaseRepository::new(self.get_connection_factory().clone()))
+        Arc::new(
+            UserDatabaseRepository::new(
+                self.get_connection_factory().clone()
+            )
+        )
     }
 
     // Domain Repositories
     fn user_domain_instance(&self) -> Arc<dyn UserDomainRepository> {
-        Arc::new(UserDomainRepositoryImpl::new(self.user_database_instance()))
+        Arc::new(
+            UserDomainRepositoryImpl::new(
+                self.user_database_instance()
+            )
+        )
     }
 
     // Usecases
