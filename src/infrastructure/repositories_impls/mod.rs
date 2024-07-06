@@ -1,11 +1,15 @@
+use std::collections::HashMap;
 use std::sync::Arc;
+use chrono::Utc;
+use json_log::JsonLogger;
+use rocket::yansi::Paint;
 use uuid::Uuid;
 use crate::application::mappers::from_user_database_entity_to_domain;
 use crate::domain::entities::{NewUserDomainEntity, UpdateUserDomainEntity, UserDomainEntity};
-use crate::domain::shared::repositories::UserDomainRepository;
+use crate::domain::shared::repositories::{Logger, UserDomainRepository};
 use crate::infrastructure::database::entities::UserDatabaseEntity;
 use crate::infrastructure::database::repositories::{DatabaseRepository, UserDatabaseRepository};
-
+use crate::infrastructure::logger::{LogMetadata, LogStruct};
 
 pub struct UserDomainRepositoryImpl {
     user_database_repository: Arc<UserDatabaseRepository>,
@@ -70,5 +74,60 @@ impl UserDomainRepository for UserDomainRepositoryImpl {
     fn soft_delete(&self, id: Uuid) -> bool {
         self.user_database_repository
             .soft_delete(id)
+    }
+}
+
+pub struct DefaultLogger;
+
+
+impl DefaultLogger {
+    pub fn new() -> Self {
+        Self
+    }
+
+    fn fabricate_log(message: &str) -> LogStruct {
+        LogStruct {
+            time: Utc::now().naive_utc().format("%Y-%m-%d %H:%M:%S").to_string(),
+            message: String::from(message),
+            metadata: LogMetadata {
+                correlation_id: Uuid::new_v4().to_string(),
+                trace_id: Uuid::new_v4().to_string(),
+                method: String::from("test"),
+                headers: HashMap::new(),
+            },
+        }
+    }
+}
+impl Logger for DefaultLogger {
+    fn info(&self, message: &str) {
+        let logger = json_log::get_default_logger();
+
+        logger.info(
+            Self::fabricate_log(message)
+        )
+    }
+
+    fn error(&self, message: &str) {
+        let logger = json_log::get_default_logger();
+
+        logger.error(
+            Self::fabricate_log(message)
+        )
+    }
+
+    fn warn(&self, message: &str) {
+        let logger = json_log::get_default_logger();
+
+        logger.warn(
+            Self::fabricate_log(message)
+        )
+    }
+
+    fn debug(&self, message: &str) {
+        let logger = json_log::get_default_logger();
+
+        logger.debug(
+            Self::fabricate_log(message)
+        )
     }
 }

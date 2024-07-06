@@ -14,3 +14,11 @@ pub trait UserDomainRepository {
     fn soft_delete(&self, id: Uuid) -> bool;
 
 }
+
+
+pub trait Logger {
+    fn info(&self, message: &str);
+    fn error(&self, message: &str);
+    fn warn(&self, message: &str);
+    fn debug(&self, message: &str);
+}

@@ -7,7 +7,7 @@ use rocket::{get, post, put, delete, http::Status, Response, State};
 use rocket::http::ContentType;
 use rocket::response::content;
 use rocket::response::content::RawJson;
-use crate::application::repositories_impls::UserDomainRepositoryImpl;
+use crate::infrastructure::repositories_impls::UserDomainRepositoryImpl;
 use crate::{DiContainer};
 use crate::application::entrypoints::rest::{NewUserRequestDTO, UpdateUserRequestDTO};
 use crate::domain::entities::{GenericQueryDomainEntity, UpdateUserDomainEntity, UserDomainEntity};
