@@ -4,18 +4,18 @@ use crate::domain::shared::repositories::{Logger, UserDomainRepository};
 use crate::domain::shared::UsecaseSpecification;
 
 pub struct DeleteUserUsecase {
-    user_domain_repository: Arc<dyn UserDomainRepository>,
-    logger: Arc<dyn Logger>
+    logger: Arc<dyn Logger>,
+    user_domain_repository: Arc<dyn UserDomainRepository>
 }
 
 impl DeleteUserUsecase {
     pub fn new(
-        user_domain_repository: Arc<dyn UserDomainRepository>,
-        logger: Arc<dyn Logger>
+        logger: Arc<dyn Logger>,
+        user_domain_repository: Arc<dyn UserDomainRepository>
     ) -> Self {
         Self {
-            user_domain_repository,
-            logger
+            logger,
+            user_domain_repository
         }
     }
 }

@@ -4,18 +4,18 @@ use crate::domain::entities::{GenericQueryDomainEntity, UserDomainEntity};
 use crate::domain::shared::repositories::{Logger, UserDomainRepository};
 
 pub struct ListUsersUsecase {
-    user_domain_repository: Arc<dyn UserDomainRepository>,
-    logger: Arc<dyn Logger>
+    logger: Arc<dyn Logger>,
+    user_domain_repository: Arc<dyn UserDomainRepository>
 }
 
 impl ListUsersUsecase {
     pub fn new(
+        logger: Arc<dyn Logger>,
         user_domain_repository: Arc<dyn UserDomainRepository>,
-        logger: Arc<dyn Logger>
     ) -> Self {
         Self {
-            user_domain_repository,
-            logger
+            logger,
+            user_domain_repository
         }
     }
 }

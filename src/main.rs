@@ -77,36 +77,36 @@ impl DiContainer {
     // Usecases
     fn list_users_usecase_instance(&self) -> ListUsersUsecase {
         ListUsersUsecase::new(
-            self.user_domain_instance(),
-            self.get_custom_default_logger()
+            self.get_custom_default_logger(),
+            self.user_domain_instance()
         )
     }
 
     fn create_user_usecase_instance(&self) -> CreateUserUsecase {
         CreateUserUsecase::new(
-            self.user_domain_instance(),
-            self.get_custom_default_logger()
+            self.get_custom_default_logger(),
+            self.user_domain_instance()
         )
     }
 
     fn one_user_usecase_instance(&self) -> OneUsersUsecase {
         OneUsersUsecase::new(
-            self.user_domain_instance(),
-            self.get_custom_default_logger()
+            self.get_custom_default_logger(),
+            self.user_domain_instance()
         )
     }
 
     fn update_user_usecase_instance(&self) -> UpdateUserUsecase {
         UpdateUserUsecase::new(
-            self.user_domain_instance(),
-            self.get_custom_default_logger()
+            self.get_custom_default_logger(),
+            self.user_domain_instance()
         )
     }
 
     fn delete_user_usecase_instance(&self) -> DeleteUserUsecase {
         DeleteUserUsecase::new(
-            self.user_domain_instance(),
-            self.get_custom_default_logger()
+            self.get_custom_default_logger(),
+            self.user_domain_instance()
         )
     }
 
