@@ -1,7 +1,7 @@
 use std::collections::HashMap;
-use log::Level;
 use serde::Serialize;
 use chrono::Utc;
+use log::Level;
 use serde_json::json;
 use uuid::Uuid;
 use crate::domain::shared::repositories::Logger;

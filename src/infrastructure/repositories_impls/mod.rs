@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::sync::Arc;
 use uuid::Uuid;
 use crate::application::mappers::from_user_database_entity_to_domain;
@@ -18,56 +19,67 @@ impl UserDomainRepositoryImpl {
 }
 
 impl UserDomainRepository for UserDomainRepositoryImpl {
-    fn find_all(&self, size: Option<u64>, page: Option<u64>) -> Vec<UserDomainEntity> {
-        self.user_database_repository
+    fn find_all(&self, size: Option<u64>, page: Option<u64>) -> Result<Vec<UserDomainEntity>, Box<dyn Error>> {
+        let result = self.user_database_repository
             .find_all(
                 size,
                 page,
+            )?;
+
+        Ok(
+            result
+                .into_iter()
+                .map(from_user_database_entity_to_domain)
+                .collect()
+        )
+    }
+
+    fn find_by_id(&self, id: Uuid) -> Result<UserDomainEntity, Box<dyn Error>> {
+        Ok(
+            from_user_database_entity_to_domain(
+                self.user_database_repository
+                    .find_one_by_id(id)?
             )
-            .map(from_user_database_entity_to_domain)
-            .collect()
-    }
-
-    fn find_by_id(&self, id: Uuid) -> UserDomainEntity {
-        from_user_database_entity_to_domain(
-            self.user_database_repository
-                .find_one_by_id(id)
-                .unwrap()
         )
     }
 
-    fn create_user(&self, user_domain_entity: NewUserDomainEntity) -> UserDomainEntity {
-        from_user_database_entity_to_domain(
-            self.user_database_repository
-                .create(
-                    UserDatabaseEntity {
-                        username: user_domain_entity.username,
-                        password: user_domain_entity.password,
-                        ..Default::default()
-                    }
-                )
-                .unwrap()
+    fn create_user(&self, user_domain_entity: NewUserDomainEntity) -> Result<UserDomainEntity, Box<dyn Error>> {
+        Ok(
+            from_user_database_entity_to_domain(
+                self.user_database_repository
+                    .create(
+                        UserDatabaseEntity {
+                            username: user_domain_entity.username,
+                            password: user_domain_entity.password,
+                            ..Default::default()
+                        }
+                    )?
+            )
         )
     }
 
-    fn update_user(&self, user_domain_entity: UpdateUserDomainEntity) -> UserDomainEntity {
-        from_user_database_entity_to_domain(
-            self.user_database_repository
-                .update(
-                    UserDatabaseEntity {
-                        external_id: user_domain_entity.id,
-                        username: user_domain_entity.username,
-                        password: user_domain_entity.password,
-                        ..Default::default()
-                    }
-                )
-                .unwrap()
+    fn update_user(&self, user_domain_entity: UpdateUserDomainEntity) -> Result<UserDomainEntity, Box<dyn Error>> {
+        Ok(
+            from_user_database_entity_to_domain(
+                self.user_database_repository
+                    .update(
+                        UserDatabaseEntity {
+                            external_id: user_domain_entity.id,
+                            username: user_domain_entity.username,
+                            password: user_domain_entity.password,
+                            ..Default::default()
+                        }
+                    )?
+            )
         )
     }
 
-    fn soft_delete(&self, id: Uuid) -> bool {
-        self.user_database_repository
-            .soft_delete(id)
+    fn soft_delete(&self, id: Uuid) -> Result<bool, Box<dyn Error>> {
+        let result = self.user_database_repository
+            .soft_delete(id)?;
+        Ok(
+            result > 0
+        )
     }
 }
 

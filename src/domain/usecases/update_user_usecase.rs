@@ -1,4 +1,5 @@
 use std::any::type_name;
+use std::error::Error;
 use std::sync::Arc;
 use crate::domain::entities::{UpdateUserDomainEntity, UserDomainEntity};
 use crate::domain::shared::repositories::{Logger, UserDomainRepository};
@@ -21,20 +22,19 @@ impl UpdateUserUsecase {
     }
 }
 
-impl UsecaseSpecification<UpdateUserDomainEntity, Result<UserDomainEntity, ()>> for UpdateUserUsecase {
+impl UsecaseSpecification<UpdateUserDomainEntity, Result<UserDomainEntity, Box<dyn Error>>> for UpdateUserUsecase {
     fn execute(
         &self,
         update_user_domain_entity: UpdateUserDomainEntity,
-    ) -> Result<UserDomainEntity, ()> {
+    ) -> Result<UserDomainEntity, Box<dyn Error>> {
         self.logger.info(
             type_name::<UpdateUserUsecase>().to_string(),
             "execute".to_string(),
             line!(),
             "iniciando a execução do método execute do UpdateUserUsecase".to_string(),
         );
-        Ok(
-            self.user_domain_repository
-                .update_user(update_user_domain_entity)
-        )
+
+        self.user_domain_repository
+            .update_user(update_user_domain_entity)
     }
 }

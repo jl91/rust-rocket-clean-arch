@@ -1,4 +1,5 @@
 use std::any::type_name;
+use std::error::Error;
 use std::sync::Arc;
 use crate::domain::entities::{NewUserDomainEntity, UserDomainEntity};
 use crate::domain::shared::repositories::{Logger, UserDomainRepository};
@@ -21,11 +22,11 @@ impl CreateUserUsecase {
     }
 }
 
-impl UsecaseSpecification<NewUserDomainEntity, Result<UserDomainEntity, ()>> for CreateUserUsecase {
+impl UsecaseSpecification<NewUserDomainEntity, Result<UserDomainEntity, Box<dyn Error>>> for CreateUserUsecase {
     fn execute(
         &self,
         user_domain_entity: NewUserDomainEntity,
-    ) -> Result<UserDomainEntity, ()> {
+    ) -> Result<UserDomainEntity, Box<dyn Error>> {
         self.logger.info(
             type_name::<CreateUserUsecase>().to_string(),
             "execute".to_string(),
@@ -35,7 +36,7 @@ impl UsecaseSpecification<NewUserDomainEntity, Result<UserDomainEntity, ()>> for
 
         Ok(
             self.user_domain_repository
-                .create_user(user_domain_entity)
+                .create_user(user_domain_entity)?
         )
     }
 }

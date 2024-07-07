@@ -1,4 +1,5 @@
 use std::any::type_name;
+use std::error::Error;
 use std::sync::Arc;
 use uuid::Uuid;
 use crate::domain::shared::repositories::{Logger, UserDomainRepository};
@@ -21,11 +22,11 @@ impl DeleteUserUsecase {
     }
 }
 
-impl UsecaseSpecification<Uuid, Result<bool, ()>> for DeleteUserUsecase {
+impl UsecaseSpecification<Uuid, Result<bool, Box<dyn Error>>> for DeleteUserUsecase {
     fn execute(
         &self,
         id: Uuid,
-    ) -> Result<bool, ()> {
+    ) -> Result<bool, Box<dyn Error>> {
         self.logger.info(
             type_name::<DeleteUserUsecase>().to_string(),
             "DeleteUserUsecase.execute".to_string(),
@@ -33,9 +34,7 @@ impl UsecaseSpecification<Uuid, Result<bool, ()>> for DeleteUserUsecase {
             "Iniciando a exclusão de um usuário".to_string(),
         );
 
-        Ok(
-            self.user_domain_repository
-                .soft_delete(id)
-        )
+        self.user_domain_repository
+            .soft_delete(id)
     }
 }

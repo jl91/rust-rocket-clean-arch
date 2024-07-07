@@ -1,17 +1,18 @@
+use std::error::Error;
 use uuid::Uuid;
 use crate::domain::entities::{NewUserDomainEntity, UpdateUserDomainEntity, UserDomainEntity};
 
 
 pub trait UserDomainRepository {
-    fn find_all(&self, size: Option<u64>, page: Option<u64>) -> Vec<UserDomainEntity>;
+    fn find_all(&self, size: Option<u64>, page: Option<u64>) -> Result<Vec<UserDomainEntity>, Box<dyn Error>>;
 
-    fn find_by_id(&self, id: Uuid) -> UserDomainEntity;
+    fn find_by_id(&self, id: Uuid) -> Result<UserDomainEntity, Box<dyn Error>>;
 
-    fn create_user(&self, user_domain_entity: NewUserDomainEntity) -> UserDomainEntity;
+    fn create_user(&self, user_domain_entity: NewUserDomainEntity) -> Result<UserDomainEntity, Box<dyn Error>>;
 
-    fn update_user(&self, user_domain_entity: UpdateUserDomainEntity) -> UserDomainEntity;
+    fn update_user(&self, user_domain_entity: UpdateUserDomainEntity) -> Result<UserDomainEntity, Box<dyn Error>>;
 
-    fn soft_delete(&self, id: Uuid) -> bool;
+    fn soft_delete(&self, id: Uuid) -> Result<bool, Box<dyn Error>>;
 }
 
 

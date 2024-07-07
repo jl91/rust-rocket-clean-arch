@@ -1,4 +1,5 @@
 use std::any::type_name;
+use std::error::Error;
 use std::sync::Arc;
 use uuid::Uuid;
 use crate::domain::entities::UserDomainEntity;
@@ -22,20 +23,18 @@ impl OneUsersUsecase {
     }
 }
 
- impl UsecaseSpecification<Uuid, Result<UserDomainEntity, ()>> for OneUsersUsecase {
+ impl UsecaseSpecification<Uuid, Result<UserDomainEntity, Box<dyn Error>>> for OneUsersUsecase {
      fn execute(
          &self,
          id: Uuid,
-     ) -> Result<UserDomainEntity, ()> {
+     ) -> Result<UserDomainEntity, Box<dyn Error>> {
             self.logger.info(
                 type_name::<OneUsersUsecase>().to_string(),
                 "execute".to_string(),
                 line!(),
                 "iniciando a execução do método execute do OneUsersUsecase".to_string()
             );
-         Ok(
-             self.user_domain_repository
-                 .find_by_id(id)
-         )
+         self.user_domain_repository
+             .find_by_id(id)
      }
  }
