@@ -2,7 +2,6 @@ use std::sync::Arc;
 use std::vec::IntoIter;
 use chrono::{Utc};
 use diesel::{ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
-use diesel::internal::derives::multiconnection::SelectStatementAccessor;
 use uuid::Uuid;
 use crate::infrastructure::database::connection::ConnectionFactory;
 use crate::infrastructure::database::entities::UserDatabaseEntity;
@@ -12,7 +11,7 @@ use crate::infrastructure::database::schemas::users::{created_at, deleted_at, ex
 pub trait DatabaseRepository<T, K> {
     fn create(&self, entity: T) -> QueryResult<T>;
 
-    fn find_all(&self, size: Option<i64>, page: Option<i64>) -> IntoIter<T>;
+    fn find_all(&self, size: Option<u64>, page: Option<u64>) -> IntoIter<T>;
 
     fn find_one_by_id(&self, id: K) -> QueryResult<T>;
 
@@ -46,12 +45,12 @@ impl DatabaseRepository<UserDatabaseEntity, Uuid> for UserDatabaseRepository {
             .get_result::<UserDatabaseEntity>(&mut self.connection_factory.connect().get().unwrap())
     }
 
-    fn find_all(&self, size: Option<i64>, page: Option<i64>) -> IntoIter<UserDatabaseEntity> {
+    fn find_all(&self, size: Option<u64>, page: Option<u64>) -> IntoIter<UserDatabaseEntity> {
         let limit = size.unwrap_or(10);
         let offset = page.unwrap_or(0) * limit;
         let results = users
-            .limit(limit)
-            .offset(offset)
+            .limit(limit as i64)
+            .offset(offset as i64)
             .filter(deleted_at.is_null())
             .load::<UserDatabaseEntity>(&mut self.connection_factory.connect().get().unwrap())
             .expect("Error loading users");

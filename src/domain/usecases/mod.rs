@@ -5,4 +5,4 @@ pub (crate) mod one_user_usecase;
 pub(crate) mod update_user_usecase;
 pub(crate) mod delete_user_usecase;
 
-mod usecases{}
+pub mod usecases{}

@@ -36,8 +36,8 @@ pub fn new_user(
 
 #[get("/users?<page>&<size>")]
 pub fn get_all(
-    page: Option<i64>,
-    size: Option<i64>,
+    page: Option<u64>,
+    size: Option<u64>,
     state: &State<DiContainer>,
 ) -> content::RawJson<String> {
     let data = state.list_users_usecase_instance()

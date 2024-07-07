@@ -37,6 +37,6 @@ pub struct UserDomainEntity {
 
 #[derive(Deserialize, Debug)]
 pub struct GenericQueryDomainEntity {
-    pub page: Option<i64>,
-    pub size: Option<i64>
+    pub page: Option<u64>,
+    pub size: Option<u64>
 }

@@ -24,7 +24,7 @@ impl UserDomainRepositoryImpl {
 }
 
 impl UserDomainRepository for UserDomainRepositoryImpl {
-    fn find_all(&self, size: Option<i64>, page: Option<i64>) -> Vec<UserDomainEntity> {
+    fn find_all(&self, size: Option<u64>, page: Option<u64>) -> Vec<UserDomainEntity> {
         self.user_database_repository
             .find_all(
                 size,
