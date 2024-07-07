@@ -35,7 +35,6 @@ fn rocket() -> _ {
 struct DiContainer;
 
 impl DiContainer {
-
     fn new() -> Self {
         Self
     }
@@ -52,7 +51,9 @@ impl DiContainer {
     // Database connection
     fn get_connection_factory(&self) -> Arc<dyn ConnectionFactory> {
         Arc::new(
-            ConnectionFactoryImpl::new()
+            ConnectionFactoryImpl::new(
+                std::env::var("DATABASE_URL").expect("DATABASE_URL must be set")
+            )
         )
     }
 
@@ -78,38 +79,37 @@ impl DiContainer {
     fn list_users_usecase_instance(&self) -> ListUsersUsecase {
         ListUsersUsecase::new(
             self.get_custom_default_logger(),
-            self.user_domain_instance()
+            self.user_domain_instance(),
         )
     }
 
     fn create_user_usecase_instance(&self) -> CreateUserUsecase {
         CreateUserUsecase::new(
             self.get_custom_default_logger(),
-            self.user_domain_instance()
+            self.user_domain_instance(),
         )
     }
 
     fn one_user_usecase_instance(&self) -> OneUsersUsecase {
         OneUsersUsecase::new(
             self.get_custom_default_logger(),
-            self.user_domain_instance()
+            self.user_domain_instance(),
         )
     }
 
     fn update_user_usecase_instance(&self) -> UpdateUserUsecase {
         UpdateUserUsecase::new(
             self.get_custom_default_logger(),
-            self.user_domain_instance()
+            self.user_domain_instance(),
         )
     }
 
     fn delete_user_usecase_instance(&self) -> DeleteUserUsecase {
         DeleteUserUsecase::new(
             self.get_custom_default_logger(),
-            self.user_domain_instance()
+            self.user_domain_instance(),
         )
     }
-
 }
 
 fn config_log() {
