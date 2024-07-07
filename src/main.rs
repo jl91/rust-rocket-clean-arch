@@ -17,7 +17,7 @@ use crate::domain::usecases::one_user_usecase::OneUsersUsecase;
 use crate::domain::usecases::update_user_usecase::UpdateUserUsecase;
 use crate::infrastructure::database::connection::{ConnectionFactory, ConnectionFactoryImpl};
 use crate::infrastructure::database::repositories::{DatabaseRepository, UserDatabaseRepository};
-use crate::infrastructure::repositories_impls::JsonLogger;
+use infrastructure::logger::JsonLogger;
 
 #[launch]
 fn rocket() -> _ {
@@ -42,7 +42,7 @@ impl DiContainer {
     //Logger
     fn get_custom_default_logger(&self) -> Arc<dyn domain::shared::repositories::Logger> {
         Arc::new(
-            infrastructure::repositories_impls::DefaultLogger::new(
+            infrastructure::logger::DefaultLogger::new(
                 JsonLogger::new()
             )
         )
