@@ -23,7 +23,6 @@ impl ConnectionFactoryImpl {
 impl ConnectionFactory for ConnectionFactoryImpl{
 
     fn connect(&self) -> Pool<ConnectionManager<PgConnection>> {
-        dotenvy::dotenv().ok();
         let manager = ConnectionManager::<PgConnection>::new(
             &self.database_url
         );

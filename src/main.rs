@@ -50,9 +50,13 @@ impl DiContainer {
 
     // Database connection
     fn get_connection_factory(&self) -> Arc<dyn ConnectionFactory> {
+        dotenvy::dotenv().ok();
+        let database_url = std::env::var("DATABASE_URL")
+            .expect("DATABASE_URL must be set");
+
         Arc::new(
             ConnectionFactoryImpl::new(
-                std::env::var("DATABASE_URL").expect("DATABASE_URL must be set")
+                database_url
             )
         )
     }
