@@ -196,7 +196,6 @@ dependencies = [
  "chrono",
  "diesel",
  "dotenvy",
- "json_log",
  "log",
  "r2d2",
  "rocket",
@@ -674,17 +673,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "29c15563dc2726973df627357ce0c9ddddbea194836909d655df6a75d2cf296d"
 dependencies = [
  "wasm-bindgen",
-]
-
-[[package]]
-name = "json_log"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "25b59af2d9d3b64a30b6149e3b0b5bf72651b949a96284697eed2e0e6c5a5d86"
-dependencies = [
- "log",
- "serde",
- "serde_json",
 ]
 
 [[package]]

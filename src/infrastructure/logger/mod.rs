@@ -1,9 +1,11 @@
 use std::collections::HashMap;
+use log::Level;
 use serde::Serialize;
 
 #[derive(Serialize, Debug)]
 pub struct LogStruct {
-    pub time: String,
+    pub _time: String,
+    pub level: String,
     pub message: String,
     pub metadata: LogMetadata,
 }
