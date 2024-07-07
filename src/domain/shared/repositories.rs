@@ -12,13 +12,12 @@ pub trait UserDomainRepository {
     fn update_user(&self, user_domain_entity: UpdateUserDomainEntity) -> UserDomainEntity;
 
     fn soft_delete(&self, id: Uuid) -> bool;
-
 }
 
 
 pub trait Logger {
-    fn info(&self, message: &str);
-    fn error(&self, message: &str);
-    fn warn(&self, message: &str);
-    fn debug(&self, message: &str);
+    fn info(&self, object: String, method: String, line: u32, message: String);
+    fn error(&self, object: String, method: String, line: u32, message: String);
+    fn warn(&self, object: String, method: String, line: u32, message: String);
+    fn debug(&self, object: String, method: String, line: u32, message: String);
 }

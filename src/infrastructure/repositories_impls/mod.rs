@@ -77,8 +77,8 @@ impl UserDomainRepository for UserDomainRepositoryImpl {
     }
 }
 
-pub struct DefaultLogger<'a>{
-    logger: &'a  JsonLogger
+pub struct DefaultLogger<'a> {
+    logger: &'a JsonLogger,
 }
 
 
@@ -86,52 +86,48 @@ impl<'a> DefaultLogger<'a> {
     pub fn new(
         logger: &'a JsonLogger
     ) -> Self {
-        Self{
+        Self {
             logger
         }
     }
 
-    fn fabricate_log(message: &str) -> LogStruct {
+    fn fabricate_log(object: String, method: String, line: u32, message: String) -> LogStruct {
         LogStruct {
             time: Utc::now().naive_utc().format("%Y-%m-%d %H:%M:%S").to_string(),
-            message: String::from(message),
+            message,
             metadata: LogMetadata {
                 correlation_id: Uuid::new_v4().to_string(),
                 trace_id: Uuid::new_v4().to_string(),
-                method: String::from("test"),
                 headers: HashMap::new(),
+                object,
+                method,
+                line,
             },
         }
     }
 }
 impl Logger for DefaultLogger<'_> {
-    fn info(&self, message: &str) {
+    fn info(&self, object: String, method: String, line: u32, message: String) {
         self.logger.info(
-            Self::fabricate_log(message)
+            Self::fabricate_log(object, method, line, message)
         )
     }
 
-    fn error(&self, message: &str) {
-        let logger = json_log::get_default_logger();
-
+    fn error(&self, object: String, method: String, line: u32, message: String) {
         self.logger.error(
-            Self::fabricate_log(message)
+            Self::fabricate_log(object, method, line, message)
         )
     }
 
-    fn warn(&self, message: &str) {
-        let logger = json_log::get_default_logger();
-
+    fn warn(&self, object: String, method: String, line: u32, message: String) {
         self.logger.warn(
-            Self::fabricate_log(message)
+            Self::fabricate_log(object, method, line, message)
         )
     }
 
-    fn debug(&self, message: &str) {
-        let logger = json_log::get_default_logger();
-
+    fn debug(&self, object: String, method: String, line: u32, message: String) {
         self.logger.debug(
-            Self::fabricate_log(message)
+            Self::fabricate_log(object, method, line, message)
         )
     }
 }

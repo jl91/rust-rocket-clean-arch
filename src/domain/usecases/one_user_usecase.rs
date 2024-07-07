@@ -1,3 +1,4 @@
+use std::any::type_name;
 use std::sync::Arc;
 use uuid::Uuid;
 use crate::domain::entities::UserDomainEntity;
@@ -26,7 +27,12 @@ impl OneUsersUsecase {
          &self,
          id: Uuid,
      ) -> Result<UserDomainEntity, ()> {
-            self.logger.info("iniciando a execução do método execute do OneUsersUsecase");
+            self.logger.info(
+                type_name::<OneUsersUsecase>().to_string(),
+                "execute".to_string(),
+                line!(),
+                "iniciando a execução do método execute do OneUsersUsecase".to_string()
+            );
          Ok(
              self.user_domain_repository
                  .find_by_id(id)

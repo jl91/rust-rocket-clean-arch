@@ -13,5 +13,7 @@ pub struct LogMetadata {
     pub correlation_id: String,
     pub trace_id: String,
     pub headers: HashMap<String, String>,
+    pub object: String,
     pub method: String,
+    pub line: u32,
 }
