@@ -6,7 +6,6 @@ mod domain;
 mod infrastructure;
 
 use std::sync::Arc;
-use log::LevelFilter;
 use crate::application::entrypoints::rest::users_requests_handlers::{delete_user, get_all, get_one, new_user, update_user};
 use infrastructure::repositories_impls::UserDomainRepositoryImpl;
 use crate::domain::shared::repositories::UserDomainRepository;
