@@ -8,9 +8,10 @@ use rocket::{get, post, put, delete, http::Status, Response, State};
 use rocket::http::ContentType;
 use rocket::response::{content, status};
 use rocket::response::content::RawJson;
+use rocket::response::status::Custom;
 use crate::infrastructure::repositories_impls::UserDomainRepositoryImpl;
 use crate::{DiContainer};
-use crate::application::entrypoints::rest::{NewUserRequestDTO, UpdateUserRequestDTO};
+use crate::application::entrypoints::rest::{DefaultResponse, NewUserRequestDTO, UpdateUserRequestDTO};
 use crate::domain::entities::{GenericQueryDomainEntity, UpdateUserDomainEntity, UserDomainEntity};
 use crate::domain::shared::UsecaseSpecification;
 use crate::domain::usecases::list_users_usecase::ListUsersUsecase;
@@ -22,17 +23,19 @@ use crate::application::mappers::{new_user_from_dto_to_domain, update_user_from_
 pub fn new_user(
     new_user: Json<NewUserRequestDTO>,
     state: &State<DiContainer>,
-) -> RawJson<String> {
+) -> Result<RawJson<String>, Custom<String>> {
     let new_user_domain_entity = new_user_from_dto_to_domain(new_user.0);
 
     let data = state.create_user_usecase_instance()
         .execute(new_user_domain_entity)
         .expect("Failed to create user");
 
-    let data_json = serde_json::to_string(&data)
+    let data_json = serde_json::to_string(&DefaultResponse {
+        data
+    })
         .expect("Failed to serialize users to JSON");
 
-    RawJson(data_json)
+    Ok(RawJson(data_json))
 }
 
 #[get("/users?<page>&<size>")]
@@ -40,24 +43,27 @@ pub fn get_all(
     page: Option<u64>,
     size: Option<u64>,
     state: &State<DiContainer>,
-) -> Result<content::RawJson<String>, status::Custom<String>> {
+) -> Result<content::RawJson<String>, Custom<String>> {
     let data = state.list_users_usecase_instance()
         .execute(GenericQueryDomainEntity { page, size });
 
     match data {
         Ok(users) => {
-            let json_users = serde_json::to_string(&users)
-                .map_err(|e| status::Custom(Status::InternalServerError, e.to_string()))?;
-            Ok(RawJson(json_users))
+            let json_users = serde_json::to_string(&DefaultResponse {
+                data: users
+            })
+                .map_err(|e| Custom(Status::InternalServerError, e.to_string()))?;
+            Ok(content::RawJson(json_users))
         }
         Err(err) => Err(
-            status::Custom(
+            Custom(
                 Status::InternalServerError,
-                format!("Failed to list users: {}", err)
+                format!("Failed to list users: {:?}", err),
             )
         ),
     }
 }
+
 
 #[get("/users/<id>")]
 pub fn get_one(
@@ -71,14 +77,16 @@ pub fn get_one(
 
     match data {
         Ok(users) => {
-            let json_users = serde_json::to_string(&users)
-                .map_err(|e| status::Custom(Status::InternalServerError, e.to_string()))?;
-            Ok(RawJson(json_users))
+            let json_users = serde_json::to_string(&DefaultResponse {
+                data: users
+            })
+                .map_err(|e| Custom(Status::InternalServerError, e.to_string()))?;
+            Ok(content::RawJson(json_users))
         }
         Err(err) => Err(
-            status::Custom(
+            Custom(
                 Status::InternalServerError,
-                format!("Failed to list user: {}", id)
+                format!("Failed to list user: {}", err),
             )
         ),
     }
@@ -99,14 +107,16 @@ pub fn update_user(
 
     match data {
         Ok(users) => {
-            let json_users = serde_json::to_string(&users)
+            let json_users = serde_json::to_string(&DefaultResponse{
+                data: users
+            })
                 .map_err(|e| status::Custom(Status::InternalServerError, e.to_string()))?;
             Ok(RawJson(json_users))
         }
         Err(err) => Err(
             status::Custom(
                 Status::InternalServerError,
-                format!("Failed to update user: {}", id.clone())
+                format!("Failed to update user: {}", id.clone()),
             )
         ),
     }
@@ -124,14 +134,16 @@ pub fn delete_user(
 
     match data {
         Ok(users) => {
-            let json_users = serde_json::to_string(&users)
+            let json_users = serde_json::to_string(&DefaultResponse{
+                data: users
+            })
                 .map_err(|e| status::Custom(Status::InternalServerError, e.to_string()))?;
             Ok(RawJson(json_users))
         }
         Err(err) => Err(
             status::Custom(
                 Status::InternalServerError,
-                format!("Failed to delete user id: {}", id.clone())
+                format!("Failed to delete user id: {}", id.clone()),
             )
         ),
     }
