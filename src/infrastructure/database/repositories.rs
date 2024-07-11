@@ -1,8 +1,6 @@
-use std::error::Error;
 use std::sync::Arc;
 use chrono::{Utc};
 use diesel::{ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
-use r2d2::PooledConnection;
 use uuid::Uuid;
 use crate::infrastructure::database::connection::ConnectionFactory;
 use crate::infrastructure::database::entities::UserDatabaseEntity;
@@ -10,6 +8,7 @@ use crate::infrastructure::database::schemas::users::dsl::{users};
 use crate::infrastructure::database::schemas::users::{created_at, deleted_at, external_id, password, updated_at, username};
 
 pub trait DatabaseRepository<T, K> {
+
     fn create(&self, entity: T) -> QueryResult<T>;
 
     fn find_all(&self, size: Option<u64>, page: Option<u64>) -> QueryResult<Vec<T>>;

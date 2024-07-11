@@ -43,17 +43,22 @@ pub fn get_all(
     page: Option<u64>,
     size: Option<u64>,
     state: &State<DiContainer>,
-) -> Result<content::RawJson<String>, Custom<String>> {
+) -> Result<Custom<RawJson<String>>, Custom<String>> {
     let data = state.list_users_usecase_instance()
         .execute(GenericQueryDomainEntity { page, size });
 
     match data {
         Ok(users) => {
+
             let json_users = serde_json::to_string(&DefaultResponse {
                 data: users
-            })
-                .map_err(|e| Custom(Status::InternalServerError, e.to_string()))?;
-            Ok(content::RawJson(json_users))
+            });
+
+            match json_users {
+                Ok(data) => Ok(Custom(Status::Ok, RawJson(data))),
+                Err(err) => Err(Custom(Status::InternalServerError, "Error".parse().unwrap()))
+            }
+
         }
         Err(err) => Err(
             Custom(
