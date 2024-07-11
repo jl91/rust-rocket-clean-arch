@@ -24,9 +24,9 @@ pub fn new_user_from_dto_to_domain(dto: NewUserRequestDTO) -> NewUserDomainEntit
 }
 
 
-pub fn update_user_from_dto_to_domain(id: String, dto: UpdateUserRequestDTO) -> UpdateUserDomainEntity {
+pub fn update_user_from_dto_to_domain(id: Uuid, dto: UpdateUserRequestDTO) -> UpdateUserDomainEntity {
     UpdateUserDomainEntity {
-        id: Uuid::parse_str(&*id).unwrap(),
+        id,
         username: dto.username,
         password: dto.password
     }
