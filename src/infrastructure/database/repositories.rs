@@ -8,7 +8,6 @@ use crate::infrastructure::database::schemas::users::dsl::{users};
 use crate::infrastructure::database::schemas::users::{created_at, deleted_at, external_id, password, updated_at, username};
 
 pub trait DatabaseRepository<T, K> {
-
     fn create(&self, entity: T) -> QueryResult<T>;
 
     fn find_all(&self, size: Option<u64>, page: Option<u64>) -> QueryResult<Vec<T>>;
@@ -36,20 +35,20 @@ impl UserDatabaseRepository {
 
 impl DatabaseRepository<UserDatabaseEntity, Uuid> for UserDatabaseRepository {
     fn create(&self, new_user: UserDatabaseEntity) -> QueryResult<UserDatabaseEntity> {
-            diesel::insert_into(users)
-                .values((
-                    username.eq(new_user.username),
-                    password.eq(new_user.password),
-                    created_at.eq(Utc::now().naive_utc()),
-                ))
-                .get_result::<UserDatabaseEntity>(&mut self.connection_factory.connect().get().unwrap())
+        diesel::insert_into(users)
+            .values((
+                username.eq(new_user.username),
+                password.eq(new_user.password),
+                created_at.eq(Utc::now().naive_utc()),
+            ))
+            .get_result::<UserDatabaseEntity>(&mut self.connection_factory.connect().get().unwrap())
     }
 
-    fn find_all(&self, size: Option<u64>, page: Option<u64>) -> QueryResult<Vec<UserDatabaseEntity>>{
+    fn find_all(&self, size: Option<u64>, page: Option<u64>) -> QueryResult<Vec<UserDatabaseEntity>> {
         let limit = size.unwrap_or(10);
         let offset = page.unwrap_or(0) * limit;
 
-         users
+        users
             .limit(limit as i64)
             .offset(offset as i64)
             .filter(deleted_at.is_null())
@@ -72,10 +71,11 @@ impl DatabaseRepository<UserDatabaseEntity, Uuid> for UserDatabaseRepository {
     }
 
     fn soft_delete(&self, user_id: Uuid) -> QueryResult<usize> {
-      diesel::update(users.filter(external_id.eq(user_id)))
+        diesel::update(users.filter(external_id.eq(user_id)))
             .set(
                 (deleted_at.eq(Utc::now().naive_utc()))
             )
+            .filter(deleted_at.is_null())
             .execute(&mut self.connection_factory.connect().get().unwrap())
     }
 }

@@ -11,13 +11,26 @@ use rocket::response::content::RawJson;
 use rocket::response::status::Custom;
 use crate::infrastructure::repositories_impls::UserDomainRepositoryImpl;
 use crate::{DiContainer};
-use crate::application::entrypoints::rest::{DefaultResponse, NewUserRequestDTO, UpdateUserRequestDTO};
+use crate::application::entrypoints::rest::{DefaultResponse};
 use crate::domain::entities::{GenericQueryDomainEntity, UpdateUserDomainEntity, UserDomainEntity};
 use crate::domain::shared::UsecaseSpecification;
 use crate::domain::usecases::list_users_usecase::ListUsersUsecase;
 use crate::infrastructure::database::repositories::UserDatabaseRepository;
 use rocket::serde::{Deserialize, json::Json};
 use crate::application::mappers::{new_user_from_dto_to_domain, update_user_from_dto_to_domain};
+
+
+#[derive(Deserialize)]
+pub struct NewUserRequestDTO {
+    pub username: String,
+    pub password: String,
+}
+
+#[derive(Deserialize)]
+pub struct UpdateUserRequestDTO {
+    pub username: String,
+    pub password: String,
+}
 
 #[post("/users", format = "json", data = "<new_user>")]
 pub fn new_user(

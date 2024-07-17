@@ -45,7 +45,7 @@ impl DefaultLogger {
         message: String
     ) -> LogStruct {
         LogStruct {
-            _time: Utc::now().naive_utc().format("%Y-%m-%d %H:%M:%S").to_string(),
+            _time: Utc::now().naive_utc().format("%Y-%m-%d %H:%M:%S.%3f").to_string(),
             level: level.to_string(),
             message,
             metadata: LogMetadata {
